@@ -1,7 +1,7 @@
 [tool.poetry]
 name = "blepjr"
 version = "0.1.0"
-description = "Third Second try at mkaing a discord management bot"
+description = "Third Second try at making a discord management bot"
 authors = ["Justin Martin <professional@justinm.me>"]
 
 [tool.poetry.dependencies]
