@@ -2,6 +2,15 @@ from . import tools
 # command prefix
 cmd_prefix = '!'
 
+def adminCommand(cls):
+    cls.needsAdmin = True
+    return cls
+
+def userCommand(cls):
+    cls.needsAdmin = False
+    return cls
+
+
 """
 Classes representing the commands the bot is able
 """
@@ -10,7 +19,7 @@ class help:
     name = 'Help'
     description = 'Sends information on commands (sends directly to user by default)'
     arguments = '"us": (optional) sends message to channel'
-    usage = f'`{cmd_prefix}help`, `{cmd_prefix}help "us"`'
+    usage = '`{cmd_prefix}help`, `{cmd_prefix}help "us"`'
 
     # message which contains all the help information; Built by function below
     __help_msg = 'The following are the commands implemented by this bot.\n\n'
@@ -56,9 +65,28 @@ class poll:
         poll = '\n'.join([f'{emote} {option}' for emote, option in args])
         return msg.channel, title, poll, reactions
 
+class invite:
+    # Command information (Used by the help command)
+    name = 'Invite'
+    description = 'Sends the invite link for the bot'
+    arguments = '"us": (optional) sends message to channel'
+    usage = f'`{cmd_prefix}invite`, `{cmd_prefix}invite "us"`'
+
+    @staticmethod
+    def run(msg, args):
+        """Sends message with bot's invite link to user or channel
+        param=msg: message sent; args: arguments parsed from message sent
+        returns=tuple representing the output to discord - destination, msg, embed, reactions
+        """
+        invite_link = 'https://discordapp.com/api/oauth2/authorize?client_id=658913240952340481&permissions=268766294&scope=bot'
+        if args and args[0].lower() == 'us':
+            return msg.channel, invite_link, None, []
+        else:
+            return msg.author, invite_link, None, []
 
 # commands implemented by bot in the form of a dictionary - values are classes
 commands = {
     'help': help,
-    'poll': poll
+    'poll': poll,
+    'invite': invite
 }
