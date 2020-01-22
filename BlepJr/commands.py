@@ -1,6 +1,5 @@
+import discord
 from . import tools
-# command prefix
-cmd_prefix = '!'
 
 def adminCommand(cls):
     cls.needsAdmin = True
@@ -10,46 +9,79 @@ def userCommand(cls):
     cls.needsAdmin = False
     return cls
 
+"""WIP"""
+class output:
+    def __init__(destination, msg, embed, reactions):
+        self.destination = destination
+        self.message = msg
+        self.embed = embed
+        self.reactions = reactions
+
 
 """
 Classes representing the commands the bot is able
 """
 class help:
-    # Command information (Used by the help command)
-    name = 'Help'
-    description = 'Sends information on commands (sends directly to user by default)'
-    arguments = '"us": (optional) sends message to channel'
-    usage = '`{cmd_prefix}help`, `{cmd_prefix}help "us"`'
+    @staticmethod
+    def help(cmd_prefix):
+        """Returns string representing help information for this command
 
-    # message which contains all the help information; Built by function below
-    __help_msg = 'The following are the commands implemented by this bot.\n\n'
+        Args:
+            cmd_prefix: String representing the prefix before the command
+        """
+        return ('Name: Help\n'
+                'Description: Sends information on commands (sends directly to user by default)\n'
+                'Parameters: "us": (optional) sends message to channel\n'
+               f'Usage: `{cmd_prefix}help`, `{cmd_prefix}help "us"`\n\n')
+
+    @staticmethod
+    def build_help_msg(cmd_prefix):
+        """Builds and returns help message
+
+        Uses command classes to build a help message for the commands implemented by this bot.
+        Stores message in class to be sent by the run command
+
+        Args:
+            cmd_prefix: String representing the prefix before the command
+        """
+        help_msg = 'The following are the commands implemented by this bot.\n\n'
+        for command in commands.values():
+            help_msg += command.help(cmd_prefix)
+        return help_msg
 
     @classmethod
-    def build_help_msg(cls):
-        """Builds the help message to be sent by run (class method due to changing a class variable)
-        """
-        if cls.__help_msg == 'The following are the commands implemented by this bot.\n\n':
-            for command in commands.values():
-                cls.__help_msg += f'name: {command.name}\nDescription: {command.description}\nParameters: {command.arguments}\nUsage: {command.usage}\n\n'
+    def run(cls, guild, msg, args):
+        """Returns tuple representing to a message representing the help message
 
-    @classmethod
-    def run(cls, msg, args):
-        """Sends message to user or channel with informatoin on all commands implemented by the bot (class method due to using a class variable)
-        param=msg: message sent; args: arguments parsed from message sent
-        returns=tuple representing the output to discord - destination, msg, embed, reactions
+        Args:
+            msg: discord.Message object representing message sent by the user
+            args: List of strings representing the arguments parsed from the above message
+
+        Returns:
+            destination, message, embed, reactions:
+                destination: Discord object representing where to send the message
+                message: String representing message content to send
+                embed: String representing content to embed in the message sent
+                reactions: List representing emotes to react with
         """
-        cls.build_help_msg()
+        help_msg = cls.build_help_msg(guild.cmd_prefix)
         if args and args[0].lower() == 'us':
             return msg.channel, '', cls.__help_msg, []
         else:
             return msg.author, '', cls.__help_msg, []
 
 class poll:
-    # Command information (Used by the help command)
-    name = 'Poll'
-    description = 'Sends a poll as a reactable message'
-    arguments = "Title: What's being polled; Emote: (optional for each option) Emote representing the option; Option: option being voted on"
-    usage = f'`{cmd_prefix}poll "Is this a title" ":thumbsup:: Ye" ":thumbsdown:: Nah"`, `{cmd_prefix}poll "This is a title" "Ye" "Nah"`'
+    @staticmethod
+    def help(cmd_prefix):
+        """Returns string representing help information for this command
+
+        Args:
+            cmd_prefix: String representing the prefix before the command
+        """
+        return ('Name: Poll\n'
+                'Description: Sends a poll as a reactable message\n'
+                "Title: What's being polled; Emote: (optional for each option) Emote representing the option; Option: option being voted on\n"
+               f'Usage: `{cmd_prefix}poll "Is this a title" ":thumbsup:: Ye" ":thumbsdown:: Nah"`, `{cmd_prefix}poll "This is a title" "Ye" "Nah"`\n\n')
 
     @staticmethod
     def run(msg, args):
@@ -66,17 +98,29 @@ class poll:
         return msg.channel, title, poll, reactions
 
 class invite:
-    # Command information (Used by the help command)
-    name = 'Invite'
-    description = 'Sends the invite link for the bot'
-    arguments = '"us": (optional) sends message to channel'
-    usage = f'`{cmd_prefix}invite`, `{cmd_prefix}invite "us"`'
+    @staticmethod
+    def help(cmd_prefix):
+        """Returns string representing help information for this command
+
+        Args:
+            cmd_prefix: String representing the prefix before the command
+        """
+        return ('Name: Invite\n'
+                'Description: Sends the invite link for the bot\n'
+                '"us": (optional) sends message to channel\n'
+               f'Usage: `{cmd_prefix}invite`, `{cmd_prefix}invite "us"`\n\n')
 
     @staticmethod
     def run(msg, args):
         """Sends message with bot's invite link to user or channel
         param=msg: message sent; args: arguments parsed from message sent
-        returns=tuple representing the output to discord - destination, msg, embed, reactions
+
+        Returns:
+            destination, message, embed, reactions:
+                destination: Discord object representing where to send the message
+                message: String representing message content to send
+                embed: String representing content to embed in the message sent
+                reactions: List representing emotes to react with
         """
         invite_link = 'https://discordapp.com/api/oauth2/authorize?client_id=658913240952340481&permissions=268766294&scope=bot'
         if args and args[0].lower() == 'us':
@@ -88,5 +132,5 @@ class invite:
 commands = {
     'help': help,
     'poll': poll,
-    'invite': invite
+    'invite': invite,
 }

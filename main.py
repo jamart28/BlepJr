@@ -33,7 +33,7 @@ async def on_message(msg):
             await msg.add_reaction(reaction)
     else:
         if msg.content.startswith(commands.cmd_prefix):
-            command, args = tools.parse_message(msg.content, commands.cmd_prefix)
+            command, args = tools.parse_message(msg.content[len(commands.cmd_prefix):])
             if command in commands.commands:
                 dest, content, embed, reactions = commands.commands[command].run(msg, args)
                 await dest.send(content, embed=discord.Embed(description=embed, color=BlepJrBot.color) if embed else embed)
@@ -49,7 +49,7 @@ async def on_message(msg):
             await msg.add_reaction(reaction)
     else:
         if msg.content.startswith(guild.cmd_prefix):
-            command, args = tools.parse_message(msg.content, guild.cmd_prefix)
+            command, args = tools.parse_message(msg.content[len(guild.cmd_prefix):])
             if command in command.commands:
                 if !command.needsAdmin or
                     (command.needsAdmin and msg.user in server.admins):

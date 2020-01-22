@@ -1,16 +1,28 @@
+import discord
 import sqlite3
 
 def addServer(guild):
     # sql magic probably
     pass
 
+@dataclass
 class Server:
-    def __init__(self, guild_id):
-        # make the thing normally
+    guild_id: int
+    cmd_prefix: str
+    color: discord.Color
+    admins: list
+    mods: list
+
+    def add(self):
+        # magically convert the thing to sql
         pass
 
-    def addServer(self):
-        # magically convert the thing to sql
+    def update(self):
+        # magically update the sql
+        pass
+
+    def delete(self):
+        # magically delete the server from sql
         pass
 
     @classmethod
