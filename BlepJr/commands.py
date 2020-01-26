@@ -51,7 +51,9 @@ class help:
 
     @classmethod
     def run(cls, guild, msg, args):
-        """Returns tuple representing to a message representing the help message
+        """Returns tuple representing a help message
+
+        Contains information on all implemented commands. Message built by build_help_msg().
 
         Args:
             msg: discord.Message object representing message sent by the user
@@ -80,14 +82,28 @@ class poll:
         """
         return ('Name: Poll\n'
                 'Description: Sends a poll as a reactable message\n'
-                "Title: What's being polled; Emote: (optional for each option) Emote representing the option; Option: option being voted on\n"
-               f'Usage: `{cmd_prefix}poll "Is this a title" ":thumbsup:: Ye" ":thumbsdown:: Nah"`, `{cmd_prefix}poll "This is a title" "Ye" "Nah"`\n\n')
+                "Title: What's being polled; Emote: (optional for each option) Emote representing "
+                "the option; Option: option being voted on\n"
+               f'Usage: `{cmd_prefix}poll "Is this a title" ":thumbsup:: Ye" ":thumbsdown:: Nah"`, '
+               f'`{cmd_prefix}poll "This is a title" "Ye" "Nah"`\n\n')
 
     @staticmethod
     def run(msg, args):
-        """Sends message to channel with reactions to act as a poll
-        param=msg: message sent; args: arguments parsed from message sent
-        returns=tuple representing the output to discord - destination, msg, embed, reactions
+        """Returns tuple representing a message representing a poll
+
+        Uses reactions to represent the different options as parsed from the discord message of the
+        bot command call.
+
+        Args:
+            msg: discord.Message object representing message sent by the user
+            args: List of strings representing the arguments parsed from the above message
+
+        Returns:
+            destination, message, embed, reactions:
+                destination: Discord object representing where to send the message
+                message: String representing message content to send
+                embed: String representing content to embed in the message sent
+                reactions: List representing emotes to react with
         """
         title = f'**:bar_chart:{args[0]}**'
         args = tools.parse_emotes(args[1:])
@@ -112,8 +128,14 @@ class invite:
 
     @staticmethod
     def run(msg, args):
-        """Sends message with bot's invite link to user or channel
-        param=msg: message sent; args: arguments parsed from message sent
+        """Returns tuple representing an invite message
+
+        Sets destination to channel or user based off the "us" parameter of the discord message for
+        the bot command call.
+
+        Args:
+            msg: discord.Message object representing message sent by the user
+            args: List of strings representing the arguments parsed from the above message
 
         Returns:
             destination, message, embed, reactions:
