@@ -2,8 +2,8 @@
 
 The following are tasks to be completed:
   - Do this using github issues instead
-  - Implement server object with sql backend
-  - Finish correcting docstrings and other comments
+  - Finish implementing server object with sql backend
+  - Implement main.py new server objects
   - Rewrite main.py with a main() function
   - Add daemoning with CLI interface
   - Update README to be presentable
@@ -12,4 +12,4 @@ The following are tasks to be completed:
     - Delete tracker
     - Role manager
   - Add functionality:
-    - command editing
+    - command editing through original command message
