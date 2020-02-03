@@ -1,9 +1,6 @@
 import discord
 import sqlite3
-
-def addServer(guild):
-    # sql magic probably
-    pass
+from dataclasses import dataclass
 
 @dataclass
 class Server:
