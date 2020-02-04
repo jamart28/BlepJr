@@ -5,7 +5,7 @@ The following are tasks to be completed:
   - Finish implementing server object with sql backend
   - Implement main.py new server objects
   - Rewrite main.py with a main() function
-  - Add daemoning with CLI interface
+  - Running as a service: [#1](https://github.com/jamart28/BlepJr/issues/1)
   - Update README to be presentable
   - Check and correct command.help() for each command
   - Add functions:
