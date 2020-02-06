@@ -13,26 +13,28 @@ class Server:
     _db = 'blepjr.db'
 
     def add(self):
-        """Adds this server to the sbot's database
+        """Adds this server to the bot's database
         """
         conn = sqlite3.connect(self._db)
         crsr = conn.cursor()
 
-        crsr.execute(('INSERT INTO servers'
+        crsr.execute('INSERT INTO servers\n'
                      f'VALUES ({self.id}, "{self.cmd_prefix}", "{self.color.to_rgb()}");'
-        ))
+        )
 
-
-        for (mod in self.mods):
-            crsr.execute(('INSERT INTO mods'
+        for mod in self.mods:
+            crsr.execute('INSERT INTO mods\n'
                          f'VALUES ({admin.id}, 0, {self.id});'
-            ))
+            )
 
-        for (admin in self.admins):
-            crsr.execute(('UPDATE mods'
-                          'SET admin=1'
+        for admin in self.admins:
+            crsr.execute('UPDATE mods\n'
+                          'SET admin=1\n'
                          f'WHERE user_id={admin.id} AND server_id={self.id};'
-            ))
+            )
+
+        conn.commit()
+        conn.close()
 
         print(f'Server {self.id} added to database {self._db}')
 
@@ -44,6 +46,9 @@ class Server:
 
         crsr.execute(f'DELETE FROM servers WHERE id={self.id};')
         crsr.execute(f'DELETE FROM mods WHERE id={self.id};')
+
+        conn.commit()
+        conn.close()
 
         print(f'Server {self.id} deleted from {self._db}')
 
@@ -57,20 +62,20 @@ class Server:
         conn = sqlite3.connect(cls._db)
         crsr = conn.cursor()
 
-        crsr.execute(('SELECT *'
-                      'FROM servers'
+        crsr.execute('SELECT *\n'
+                      'FROM servers\n'
                      f'WHERE id={id};'
-        ))
+        )
 
         results = crsr.fetchone()
 
         # Assign things here
         # printing results temporarily to see structure
 
-        crsr.execute(('SELECT *'
-                      'FROM mods'
+        crsr.execute('SELECT *\n'
+                      'FROM mods\n'
                      f'WHERE id={id};'
-        ))
+        )
 
         results = crsr.fetchall()
 

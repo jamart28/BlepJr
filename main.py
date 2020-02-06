@@ -1,4 +1,5 @@
 import discord
+from BlepJr.server import Server
 from BlepJr import tools, commands
 
 # TODO: Build server structure with sql database; Add message editing and new commands
@@ -21,7 +22,9 @@ async def on_ready():
 # Called when bot joins a cuild
 @event
 async def on_guild_join(guild):
-    guild.owner.send(f"I'm all alone\n\n{guild.name}")
+    server = Server(guild.id, "!", discord.Color.blurple(), [guild.owner], [guild.owner])
+    server.add()
+    await guild.owner.send(f"I'm all alone\n\n{guild.name}")
 
 # Called when messages are sent
 @event
