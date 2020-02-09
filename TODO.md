@@ -1,10 +1,7 @@
 ## TODO
 
 The following are tasks to be completed:
-  - Do this using github issues instead
-  - Finish implementing server object with sql backend
-  - Implement main.py new server objects
-  - Rewrite main.py with a main() function
+  - Implement `on_guild_join()` and `on_guild_leave()`
   - [Running as a service](https://github.com/jamart28/BlepJr/issues/1)
   - Update README to be presentable
   - Check and correct command.help() for each command

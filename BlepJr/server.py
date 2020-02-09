@@ -1,12 +1,12 @@
-import discord
 import sqlite3
+from discord import Color
 from dataclasses import dataclass
 
 @dataclass
 class Server:
     id: int
     cmd_prefix: str
-    color: discord.Color
+    color: Color
     admins: list
     mods: list
 
@@ -18,13 +18,14 @@ class Server:
         conn = sqlite3.connect(self._db)
         crsr = conn.cursor()
 
+        r, g, b = self.color.to_rgb()
         crsr.execute('INSERT INTO servers\n'
-                     f'VALUES ({self.id}, "{self.cmd_prefix}", "{self.color.to_rgb()}");'
+                     f'VALUES ({self.id}, "{self.cmd_prefix}", {r}, {g}, {b});'
         )
 
         for mod in self.mods:
             crsr.execute('INSERT INTO mods\n'
-                         f'VALUES ({admin.id}, 0, {self.id});'
+                         f'VALUES ({mod.id}, 0, {self.id});'
             )
 
         for admin in self.admins:
@@ -45,7 +46,7 @@ class Server:
         crsr = conn.cursor()
 
         crsr.execute(f'DELETE FROM servers WHERE id={self.id};')
-        crsr.execute(f'DELETE FROM mods WHERE id={self.id};')
+        crsr.execute(f'DELETE FROM mods WHERE server_id={self.id};')
 
         conn.commit()
         conn.close()
@@ -68,18 +69,16 @@ class Server:
         )
 
         results = crsr.fetchone()
-
-        # Assign things here
-        # printing results temporarily to see structure
+        cmd_prefix = results[1]
+        color = Color.from_rgb(results[2], results[3], results[4])
 
         crsr.execute('SELECT *\n'
                       'FROM mods\n'
-                     f'WHERE id={id};'
+                     f'WHERE server_id={id};'
         )
 
         results = crsr.fetchall()
-
-        # Assign things here
-        # printing results temporarily to see structure
+        admins = [result[0] for result in results if result[1]]
+        mods = [result[0] for result in results]
 
         return cls(id, cmd_prefix, color, admins, mods)

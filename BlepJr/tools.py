@@ -12,7 +12,7 @@ def read_file(file):
     with open(file) as read_file:
         return read_file.read().rstrip()
 
-def parse_message(msg, prefix):
+def parse_message(msg):
     """Parses message into command and args
 
     Args:
@@ -51,4 +51,5 @@ def parse_emotes(args):
         # argument does not specify an emote
         else:
             new_args.append((next(default), arg.strip()))
+
     return new_args
