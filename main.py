@@ -3,11 +3,11 @@ from BlepJr.server import Server
 from BlepJr.tools import read_file, parse_message
 from BlepJr.commands import getCommands
 
+
 BlepJrBot = discord.Client()
 event = BlepJrBot.event
 
 
-# Called when bot is ready
 @event
 async def on_ready():
     print("I'm ready")
@@ -16,12 +16,19 @@ async def on_ready():
     print(discord.__version__)
 
 
-# Called when bot joins a cuild
 @event
 async def on_guild_join(guild):
     server = Server(guild.id, "!", discord.Color.blurple(), [guild.owner], [guild.owner])
     server.add()
-    await guild.owner.send(f"I'm all alone\n\n{guild.name}")
+    await guild.owner.send(server.welcome())
+    await guild.owner.send(
+        embed=Embed(description=getCommands(server)['help'].build_help_msg(), color=server.color)
+    )
+
+
+@event
+async def on_guild_remove(guild):
+    Server.getServer(guild.id).delete()
 
 
 @event

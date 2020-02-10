@@ -82,3 +82,22 @@ class Server:
         mods = [result[0] for result in results]
 
         return cls(id, cmd_prefix, color, admins, mods)
+
+    def welcome(self):
+        """Returns welcome message as a string
+        """
+        return ('Hi! Thank you for inviting me to your server. I can be used for general moderation '
+                'and some other neat tricks. A full list of my functionality is below and can be '
+                'accessed again by typing `!help`. If you have any questions, you can join my '
+                'support server to contact my developer and get updates on outages and new features '
+                'or changes as they are added: https://discord.gg/BDKn2Q5. Enjoy discording!'
+        )
+
+    def bye(self):
+        """Returns bye message as a string
+        """
+        return ("Thank you for your use of me. If there was anyting I could've done better or "
+                'any specifc reason I was left behind, please be sure to let my developer know at '
+                'the support server for this bot: https://discord.gg/BDKn2Q5.'
+
+        )
