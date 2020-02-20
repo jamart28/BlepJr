@@ -18,7 +18,7 @@ async def on_ready():
 
 @event
 async def on_guild_join(guild):
-    server = Server(guild.id, "!", discord.Color.blurple(), [guild.owner], [guild.owner])
+    server = Server(guild, "!", discord.Color.blurple(), [], [])
     server.add()
     await guild.owner.send(server.welcome())
     await guild.owner.send(
@@ -33,11 +33,11 @@ async def on_guild_remove(guild):
 
 @event
 async def on_message(msg):
-    server = Server.getServer(msg.guild.id)
+    server = Server.getServer(msg.guild)
     if msg.author != BlepJrBot.user:
         if msg.content.startswith(server.cmd_prefix):
-            command, args = parse_message(msg.content[len(server.cmd_prefix):])
             commands = getCommands(server)
+            command, args = parse_message(msg.content[len(server.cmd_prefix):])
             if command in commands:
                 await commands[command].send(msg, args)
 

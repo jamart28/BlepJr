@@ -1,10 +1,10 @@
 import sqlite3
-from discord import Color
+from discord import Color, Guild
 from dataclasses import dataclass
 
 @dataclass
 class Server:
-    id: int
+    guild: Guild
     cmd_prefix: str
     color: Color
     admins: list
@@ -20,18 +20,18 @@ class Server:
 
         r, g, b = self.color.to_rgb()
         crsr.execute('INSERT INTO servers\n'
-                     f'VALUES ({self.id}, "{self.cmd_prefix}", {r}, {g}, {b});'
+                     f'VALUES ({self.guild.id}, "{self.cmd_prefix}", {r}, {g}, {b});'
         )
 
         for mod in self.mods:
             crsr.execute('INSERT INTO mods\n'
-                         f'VALUES ({mod.id}, 0, {self.id});'
+                         f'VALUES ({mod.id}, 0, {self.guild.id});'
             )
 
         for admin in self.admins:
             crsr.execute('UPDATE mods\n'
                           'SET admin=1\n'
-                         f'WHERE user_id={admin.id} AND server_id={self.id};'
+                         f'WHERE user_id={admin.id} AND server_id={self.guild.id};'
             )
 
         conn.commit()
@@ -46,7 +46,6 @@ class Server:
         crsr = conn.cursor()
 
         crsr.execute(f'DELETE FROM servers WHERE id={self.id};')
-        crsr.execute(f'DELETE FROM mods WHERE server_id={self.id};')
 
         conn.commit()
         conn.close()
@@ -54,7 +53,7 @@ class Server:
         print(f'Server {self.id} deleted from {self._db}')
 
     @classmethod
-    def getServer(cls, id):
+    def getServer(cls, guild):
         """Retrieves a server with the given id from the bot's database and constructs server object
 
         Args:
@@ -65,7 +64,7 @@ class Server:
 
         crsr.execute('SELECT *\n'
                       'FROM servers\n'
-                     f'WHERE id={id};'
+                     f'WHERE id={guild.id};'
         )
 
         results = crsr.fetchone()
@@ -74,14 +73,14 @@ class Server:
 
         crsr.execute('SELECT *\n'
                       'FROM mods\n'
-                     f'WHERE server_id={id};'
+                     f'WHERE server_id={guild.id};'
         )
 
         results = crsr.fetchall()
-        admins = [result[0] for result in results if result[1]]
-        mods = [result[0] for result in results]
+        admins = [guild.get_member(result[0]) for result in results if result[1]]
+        mods = [guild.get_member(result[0]) for result in results]
 
-        return cls(id, cmd_prefix, color, admins, mods)
+        return cls(guild, cmd_prefix, color, admins, mods)
 
     def welcome(self):
         """Returns welcome message as a string
