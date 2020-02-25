@@ -2,9 +2,9 @@ from discord import Embed
 from abc import ABC, abstractmethod
 from BlepJr.tools import parse_emotes
 
+
 # Unsure if needed
 def needsAdmin(method):
-
     async def admin_method(self, msg, args):
         if msg.author in self.server.admins or msg.author.permissions_in(msg.channel).administrator:
             self.method(msg, args)
@@ -13,7 +13,6 @@ def needsAdmin(method):
 
 
 def needsMod(method):
-
     async def mod_method(self, msg, args):
         if msg.author in self.server.mods:
             self.method(msg, args)
@@ -22,14 +21,28 @@ def needsMod(method):
 
 
 class command(ABC):
-    @abstractmethod
     def help(self):
         """Returns string representing help information for this command
         """
-        return(f'Name: {self.name}\n'
-               f'Description: {self.description}\n'
-               f'Parameters: {self.parameters}\n'
-               f'Usage: {self.usage}\n\n')
+        if self.subcommands:
+            subcommands = ''
+            for subcommand in self.subcommands:
+                subcommands += f'`{subcommand}`, '
+            subcommands.rstrip(', ')
+            return (
+                f'Name: {self.name}\n'
+                f'Description: {self.description}\n'
+                f'Subcommands: {subcommands}\n'
+                f'Parameters: {self.parameters}\n'
+                f'Usage: {self.usage}\n\n'
+            )
+        else:
+            return (
+                f'Name: {self.name}\n'
+                f'Description: {self.description}\n'
+                f'Parameters: {self.parameters}\n'
+                f'Usage: {self.usage}\n\n'
+            )
 
     @abstractmethod
     async def send(self, msg, args):
@@ -40,8 +53,9 @@ class help(command):
     def __init__(self, server):
         self.name = 'Help'
         self.description = 'Sends information on commands (sends directly to user by default)'
-        self.parameters = 'us": (optional) sends message to channel'
-        self.usage = f'`{server.cmd_prefix}help`, `{server.cmd_prefix}help "us"`'
+        self.subcommands = None
+        self.parameters = '`here`: Sends message to channel'
+        self.usage = f'`{server.cmd_prefix}help (here)`'
         self.server = server
 
     def help(self):
@@ -53,6 +67,11 @@ class help(command):
         self.help_msg = 'The following are the commands implemented by this bot.\n\n'
         for command in getCommands(self.server).values():
             self.help_msg += command.help()
+        self.help_msg += (
+            'Key:\n`[]`: Required parameter\n`{}`: Optional parameter\n`()`: Flag; these are '
+            'optional in nature and triggered by typing the weird exact\nNote: All multi-word '
+            'arguments must be enclosed by either double-quotes or single-quotes.'
+        )
 
     async def send(self, msg, args):
         """Sends help message to the specified location
@@ -62,7 +81,7 @@ class help(command):
             args: List of strings representing the arguments parsed from the above message
         """
         self.build_help_msg()
-        if args and args[0].lower() == 'us':
+        if args and args[0].lower() == 'here':
             await msg.channel.send(embed=Embed(description=self.help_msg, color=self.server.color))
         else:
             await msg.author.send(embed=Embed(description=self.help_msg, color=self.server.color))
@@ -72,10 +91,14 @@ class poll(command):
     def __init__(self, server):
         self.name = 'Poll'
         self.description = 'Sends a poll as a reactable message'
-        self.parameters = ("Title: Poll being posed; Emote(optional): Emote representing the option"
-                           "; Option: Poll option")
-        self.usage = (f'Usage: `{server.cmd_prefix}poll "[Title]" "[Emote]: [Option]" "/{Emote/}: '
-                       '[Option]"...`')
+        self.subcommands = None
+        self.parameters = (
+            "\n• `Title`: Poll being posed\n• `Emote`: Emote representing the option\n• `Option`: Poll "
+            "option"
+        )
+        self.usage = (
+            f'`{server.cmd_prefix}poll [Title] "{{Emote}} [Option]" "{{Emote}} [Option]"...`'
+        )
         self.server = server
 
     def help(self):
@@ -94,7 +117,9 @@ class poll(command):
         reactions = [emote for emote, not_used in args]
         poll = '\n'.join([f'{emote} {option}' for emote, option in args])
 
-        bot_msg = await msg.channel.send(title, embed=Embed(description=poll, color=self.server.color))
+        bot_msg = await msg.channel.send(
+            title, embed=Embed(description=poll, color=self.server.color)
+        )
         for reaction in reactions:
             await bot_msg.add_reaction(reaction)
 
@@ -103,8 +128,9 @@ class invite(command):
     def __init__(self, server):
         self.name = 'Invite'
         self.description = 'Sends the invite link for the bot'
-        self.parameters = 'us: (optional) sends message to channel'
-        self.usage = f'Usage: `{server.cmd_prefix}invite [us]`'
+        self.subcommands = None
+        self.parameters = '`here`: Sends message to channel'
+        self.usage = f'`{server.cmd_prefix}invite (here)`'
         self.server = server
         self.link = 'https://discordapp.com/api/oauth2/authorize?client_id=658913240952340481&permissions=268766294&scope=bot'
 
@@ -129,14 +155,25 @@ class admin(command):
         self.name = 'Admin'
         self.description = 'Configures what users are able to use my admin commands'
         self.subcommands = {
-            "add": add(),
-            "delete": delete(),
-            "show": show(),
+            'add': self.add(),
+            'delete': self.delete(),
+            'show': self.show(),
         }
-        self.usage = f'Usage: `{server.cmd_prefix}admin [subcommand] [parameters]`'
+        self.parameters = "`user`: User *or* role to be configured, must be mentioned (@'ed)"
+        self.usage = f'`{server.cmd_prefix}admin [subcommand] [user]`'
         self.server = server
 
-    def help(self):
+    def add(self):
+        pass
+
+    def delete(self):
+        pass
+
+    def show(self):
+        pass
+
+    def send(self, msg, args):
+        pass
 
 
 def getCommands(server):
@@ -144,4 +181,5 @@ def getCommands(server):
         'help': help(server),
         'poll': poll(server),
         'invite': invite(server),
+        'admin': admin(server),
     }

@@ -1,5 +1,6 @@
 import emojis
 
+
 def read_file(file):
     """Reads file and returns contents within
 
@@ -12,6 +13,7 @@ def read_file(file):
     with open(file) as read_file:
         return read_file.read().rstrip()
 
+
 def parse_message(msg):
     """Parses message into command and args
 
@@ -22,8 +24,27 @@ def parse_message(msg):
         Tuple containing the command as a string and the arguments as a list
     """
     # splits arguments and command
-    msg = [mstrip for m in msg.split('"') if (mstrip := m.strip())]
+    msg = [mstrip for m in msg.split() if (mstrip:= m.strip())]
+    i = 1
+
+    while i < len(msg):
+        if msg[i].startswith('"'):
+            j = i
+            while not msg[j].endswith('"') and j < len(msg):
+                j += 1
+            msg[i] = " ".join(msg[i:(j+1)]).strip('"')
+            del msg[(i+1):(j+1)]
+        elif msg[i].startswith("'"):
+            j = i
+            while not msg[j].endswith("'") and j < len(msg):
+                j += 1
+            msg[i] = " ".join(msg[i:(j+1)]).strip("'")
+            del msg[(i+1):(j+1)]
+
+        i += 1
+
     return msg[0].lower(), msg[1:]
+
 
 def parse_emotes(args):
     """Parses emotes from arguments
@@ -52,4 +73,5 @@ def parse_emotes(args):
         else:
             new_args.append((next(default), arg.strip()))
 
+    return new_args
     return new_args
