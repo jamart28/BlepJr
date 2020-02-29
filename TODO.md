@@ -1,6 +1,8 @@
 ## TODO
 
 The following are tasks to be completed:
+  - Update the below
+  - Do we even need mods? What commands will they get? Can mods add other mods?
   - Implement `on_guild_join()` and `on_guild_leave()`
   - [Running as a service](https://github.com/jamart28/BlepJr/issues/1)
   - Update README to be presentable

@@ -24,23 +24,11 @@ class command(ABC):
     def help(self):
         """Returns string representing help information for this command
         """
-        if self.subcommands:
-            subcommands = ''
-            for subcommand in self.subcommands:
-                subcommands += f'`{subcommand}`, '
-            subcommands.rstrip(', ')
-            return (
-                f'{self.usage}\n'
-                f'{self.description}\n'
-                f'Subcommands: {subcommands}\n'
-                f'Parameters: {self.parameters}\n\n'
-            )
-        else:
-            return (
-                f'{self.usage}\n'
-                f'{self.description}\n'
-                f'Parameters: {self.parameters}\n\n'
-            )
+        return (
+            f'{self.usage}\n'
+            f'{self.description}\n'
+            f'{self.parameters}\n\n'
+        )
 
     @abstractmethod
     async def send(self, msg, args):
@@ -52,7 +40,7 @@ class help(command):
         self.usage = f'`{server.cmd_prefix}help (here)`'
         self.description = 'Sends this message to you'
         self.subcommands = None
-        self.parameters = '`here`: Sends message to channel instead'
+        self.parameters = '• `here`: Sends message to channel instead'
         self.server = server
 
     def help(self):
@@ -65,7 +53,7 @@ class help(command):
         for command in getCommands(self.server).values():
             self.help_msg += command.help()
         self.help_msg += (
-            'Key:\n`[]`: Required parameter\n`{}`: Optional parameter\n`()`: Flag; these are '
+            'Key:\n• `[]`: Required parameter\n• `{}`: Optional parameter\n• `()`: Flag; these are '
             'optional in nature and triggered by typing the weird exact\nNote: All multi-word '
             'arguments must be enclosed by either double-quotes or single-quotes.'
         )
@@ -92,8 +80,8 @@ class poll(command):
         self.description = 'Sends a poll'
         self.subcommands = None
         self.parameters = (
-            "\n• `Title`: Poll being posed\n• `Emote`: Emote representing the option\n• `Option`: Poll "
-            "option"
+            '• `Title`: Poll being posed\n• `Emote`: Emote representing the option\n• `Option`: '
+            'Poll option'
         )
         self.server = server
 
@@ -125,7 +113,7 @@ class invite(command):
         self.usage = f'`{server.cmd_prefix}invite (here)`'
         self.description = "Sends this bot's invite link to you"
         self.subcommands = None
-        self.parameters = '`here`: Sends message to channel instead'
+        self.parameters = '• `here`: Sends message to channel instead'
         self.server = server
         self.link = 'https://discordapp.com/api/oauth2/authorize?client_id=658913240952340481&permissions=268766294&scope=bot'
 
@@ -145,6 +133,51 @@ class invite(command):
             await msg.author.send(self.link)
 
 
+class mod(command):
+    def __init__(self, server):
+        self.usage = f'`{server.cmd_prefix}mod [subcommand] [user]...`'
+        self.description = 'Configures what users are able to use my admin commands'
+        self.subcommands = {
+            'add': self.add,
+            'delete': self.delete,
+            'show': self.show,
+        }
+        subcommands = ', '.join(f'`{subcommand}`' for subcommand in self.subcommands)
+        self.parameters = (
+            '• `subcommand`: Subcommand to run for configuring admins; valid subcommands: '
+            f"{subcommands}\n• `user`: Mentioned (@'ed) user **or** role to be configured\nNote: "
+            'All commands below this one, as well as this command, can only be done by bot mods'
+        )
+        self.server = server
+
+    def add(self, mods):
+        pass
+
+    def delete(self, mods):
+        pass
+
+    def show(self, mods):
+        pass
+
+    async def send(self, msg, args):
+        if args[0]:
+            subcommand = args.pop(0).lower()
+            if subcommand in self.subcommands:
+                self.subcommands[subcommand](args)
+            else:
+                await msg.channel.send(
+                    f"`{subcommand}` isn't a valid subcommand. Valid subcommands are:\n• `add`: "
+                    'add a new user or role to the list of mods\n• `delete`: Delete a user or '
+                    'role from the list of mods\n• `show`: Show the list of mod users and roles'
+                )
+        else:
+            await msg.channel.send(
+                'No subcommand was given. Valid subcommands are:\n• `add`: add a new user or role'
+                'to the list of mods\n• `delete`: Delete a user or role from the list of mods\n'
+                '• `show`: Show the list of mod users and roles'
+            )
+
+
 class admin(command):
     def __init__(self, server):
         self.usage = f'`{server.cmd_prefix}admin [subcommand] [user]...`'
@@ -154,10 +187,12 @@ class admin(command):
             'delete': self.delete,
             'show': self.show,
         }
+        subcommands = ', '.join(f'`{subcommand}`' for subcommand in self.subcommands)
         self.parameters = (
-            "`user`: User **or** role to be configured, must be mentioned (@'ed)\nNote: admins are "
-            'considered to be mods as well and thus able to run all mod commands in addition to '
-            'admin commands.'
+            '• `subcommand`: Subcommand to run for configuring admins; valid subcommands: '
+            f"{subcommands}\n• `user`: Mentioned (@'ed) user **or** role to be configured\nNote: "
+            'All commands below this one, as well as this command, can only be done by bot admins '
+            'or users with the `Administrator` permission'
         )
         self.server = server
 
@@ -180,15 +215,13 @@ class admin(command):
                 await msg.channel.send(
                     f"`{subcommand}` isn't a valid subcommand. Valid subcommands are:\n• `add`: "
                     'add a new user or role to the list of admins\n• `delete`: Delete a user or '
-                    'role from the list of admins\n• `show`: Show the full list of admin users and '
-                    'roles or show the status of a user or role (whether they are on the list)'
+                    'role from the list of admins\n• `show`: Show the list of admin users and roles'
                 )
         else:
             await msg.channel.send(
                 'No subcommand was given. Valid subcommands are:\n• `add`: add a new user or role'
                 'to the list of admins\n• `delete`: Delete a user or role from the list of admins\n'
-                '• `show`: Show the full list of admin users and roles or show the status of a '
-                'user or role (whether they are on the list)'
+                '• `show`: Show the list of admin users and roles'
             )
 
 
