@@ -196,14 +196,30 @@ class Admin(command):
         )
         self.server = server
 
-    def add(self, admins):
+    async def add(self, msg, admins):
         for admin in admins:
-            pass
+            if admin.startswith("<@!"):
+                admin = server.guild.get_member(admin[2:len(admin)])
+            elif admin.startswith("<@&"):
+                admin = server.guild.get_role(admin[2:len(admin)])
+            else:
+                await msg.channel.send(
+                    f"{admin} is not a valid mention. If it should be please consider joining my "
+                    "support server and reporting the issue to my developer: "
+                    f"`{self.server.cmd_prefix}support`."
+                )
+                continue
+            try:
+                self.server.add_admin(admin)
+            except DuplicateError:
+                await msg.channel.send(
+                    f"User or role, {admin.mention}, is already in my list of admins."
+                )
 
-    def delete(self, admins):
+    def delete(self, msg, admins):
         pass
 
-    def show(self, admins):
+    def show(self, msg, admins):
         pass
 
     async def send(self, msg, args):
