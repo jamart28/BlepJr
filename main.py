@@ -1,3 +1,4 @@
+import sys
 import discord
 from BlepJr.server import Server
 from BlepJr.tools import read_file, parse_message
@@ -35,6 +36,11 @@ async def on_guild_remove(guild):
 
 @event
 async def on_message(msg):
+    if "debug-only" in sys.argv:
+        print(msg.content)
+        return
+    if "debug" in sys.argv:
+        print(msg.content)
     if msg.guild:
         server = Server.getServer(msg.guild)
         if msg.author != BlepJrBot.user:
