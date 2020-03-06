@@ -35,7 +35,7 @@ class command(ABC):
         pass
 
 
-class help(command):
+class Help(command):
     def __init__(self, server):
         self.usage = f'`{server.cmd_prefix}help (here)`'
         self.description = 'Sends this message to you'
@@ -72,7 +72,7 @@ class help(command):
             await msg.author.send(embed=Embed(description=self.help_msg, color=self.server.color))
 
 
-class poll(command):
+class Poll(command):
     def __init__(self, server):
         self.usage = (
             f'`{server.cmd_prefix}poll [Title] "{{Emote}} [Option]" "{{Emote}} [Option]"...`'
@@ -108,7 +108,7 @@ class poll(command):
             await bot_msg.add_reaction(reaction)
 
 
-class invite(command):
+class Invite(command):
     def __init__(self, server):
         self.usage = f'`{server.cmd_prefix}invite (here)`'
         self.description = "Sends this bot's invite link to you"
@@ -133,7 +133,7 @@ class invite(command):
             await msg.author.send(self.link)
 
 
-class mod(command):
+class Mod(command):
     def __init__(self, server):
         self.usage = f'`{server.cmd_prefix}mod [subcommand] [user]...`'
         self.description = 'Configures what users are able to use my admin commands'
@@ -178,7 +178,7 @@ class mod(command):
             )
 
 
-class admin(command):
+class Admin(command):
     def __init__(self, server):
         self.usage = f'`{server.cmd_prefix}admin [subcommand] [user]...`'
         self.description = 'Configures what users are able to use my admin commands'
@@ -228,8 +228,8 @@ class admin(command):
 
 def getCommands(server):
     return {
-        'help': help(server),
-        'poll': poll(server),
-        'invite': invite(server),
-        'admin': admin(server),
+        'help': Help(server),
+        'poll': Poll(server),
+        'invite': Invite(server),
+        'admin': Admin(server),
     }
