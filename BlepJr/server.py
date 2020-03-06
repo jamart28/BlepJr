@@ -107,3 +107,7 @@ class Server:
             'any specifc reason I was left behind, please be sure to let my developer know at '
             'the support server for this bot: https://discord.gg/BDKn2Q5.'
         )
+
+
+class DuplicateError(Exception):
+    pass
